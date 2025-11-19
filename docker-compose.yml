@@ -1,10 +1,7 @@
-version: "3.9"
-
 services:
   # ---------- Infraestructura ----------
   activemq:
     image: rmohr/activemq:latest
-    container_name: activemq
     restart: always
     ports:
       - "61616:61616"
@@ -17,7 +14,6 @@ services:
 
   hazelcast:
     image: hazelcast/hazelcast:latest
-    container_name: hazelcast-1
     environment:
       - HZ_CLUSTERNAME=search-cluster
     networks:
@@ -28,8 +24,7 @@ services:
   ingestion-service:
     build:
       context: ./ingestion-service
-      dockerfile: Dockerfile    # realmente podrías omitir esta línea
-    container_name: ingestion-service
+      dockerfile: Dockerfile
     environment:
       - JAVA_OPTS=
     volumes:
@@ -45,7 +40,6 @@ services:
     build:
       context: ./indexing-service
       dockerfile: Dockerfile
-    container_name: indexing-service
     environment:
       - DATAMART_DB=./datamart/index.db
     volumes:
@@ -63,7 +57,6 @@ services:
     build:
       context: ./search-service
       dockerfile: Dockerfile
-    # Ojo: sin container_name si quieres escalar
     environment:
       - DATAMART_DB=./datamart/index.db
     volumes:
@@ -79,7 +72,6 @@ services:
     build:
       context: ./control-module
       dockerfile: Dockerfile
-    container_name: control-service
     environment:
       - INGESTION_URL=http://ingestion-service:7001
       - INDEXING_URL=http://indexing-service:7002
@@ -95,9 +87,8 @@ services:
 
   benchmark:
     build:
-      context: ./benchmarks      # si tu Dockerfile de benchmark está ahí
+      context: ./benchmarks
       dockerfile: Dockerfile
-    container_name: benchmark
     environment:
       - INGESTION_URL=http://ingestion-service:7001
       - INDEXING_URL=http://indexing-service:7002
@@ -109,7 +100,6 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: search_load_balancer
     ports:
       - "8080:80"
     volumes:
