@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="16e7113a-4a3d-47e5-be7d-754df9c3927b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/src/main/java/es/ulpgc/searchengine/benchmarks/BenchmarkApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/src/main/java/es/ulpgc/searchengine/benchmarks/BenchmarkResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/src/main/java/es/ulpgc/searchengine/benchmarks/BenchmarkRunner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benchmarks/src/main/java/es/ulpgc/searchengine/benchmarks/utils/HttpHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control-module/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control-module/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control-module/src/main/java/es/ulpgc/searchengine/control/ControlApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control-module/src/main/java/es/ulpgc/searchengine/control/Controller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/src/main/java/es/ulpgc/searchengine/indexing/Indexer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/src/main/java/es/ulpgc/searchengine/indexing/IndexingApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/src/main/java/es/ulpgc/searchengine/indexing/IndexingController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/src/main/java/es/ulpgc/searchengine/indexing/MetadataExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/indexing-service/src/main/java/es/ulpgc/searchengine/indexing/repository/DatamartSQLite.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/src/main/java/es/ulpgc/searchengine/ingestion/IngestionApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/src/main/java/es/ulpgc/searchengine/ingestion/IngestionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/src/main/java/es/ulpgc/searchengine/ingestion/model/BookData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/src/main/java/es/ulpgc/searchengine/ingestion/utils/DatalakeManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ingestion-service/src/main/java/es/ulpgc/searchengine/ingestion/utils/Downloader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/microbenchmarks/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/microbenchmarks/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/microbenchmarks/src/main/java/es/ulpgc/searchengine/FileSystemBenchmarks.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/microbenchmarks/src/main/java/es/ulpgc/searchengine/MicrobenchmarkApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/microbenchmarks/src/main/java/es/ulpgc/searchengine/TextBenchmarks.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/src/main/java/es/ulpgc/searchengine/search/AdvancedSearchEngine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/src/main/java/es/ulpgc/searchengine/search/LocalCli.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/src/main/java/es/ulpgc/searchengine/search/SearchApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/src/main/java/es/ulpgc/searchengine/search/SearchController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/search-service/src/main/java/es/ulpgc/searchengine/search/repository/DatamartSQLite.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="35hcUafj0AzUMesyp8sq42fYul4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven.stage-2 [clean].executor": "Run",
+    "Maven.stage-2 [package].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/judpo/OneDrive/Escritorio/Tercero/BD/Práctica/stage-3 (4)/stage-3/stage-2",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.21829.142" />
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-IU-242.21829.142" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="16e7113a-4a3d-47e5-be7d-754df9c3927b" name="Changes" comment="" />
+      <created>1763565760683</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763565760683</updated>
+      <workItem from="1763565761810" duration="2843000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
