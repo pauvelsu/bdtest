@@ -1,5 +1,5 @@
 services:
-  # ---------- Infraestructura ----------
+  # ---------- ActiveMQ ----------
   activemq:
     image: rmohr/activemq:latest
     restart: always
@@ -9,9 +9,15 @@ services:
     environment:
       - ACTIVEMQ_ADMIN_LOGIN=admin
       - ACTIVEMQ_ADMIN_PASSWORD=admin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     networks:
       - search_net
 
+  # ---------- Hazelcast ----------
   hazelcast:
     image: hazelcast/hazelcast:latest
     environment:
@@ -19,55 +25,64 @@ services:
     networks:
       - search_net
 
-  # ---------- Servicios de negocio ----------
-
+  # ---------- Ingestion Service ----------
   ingestion-service:
     build:
       context: ./ingestion-service
       dockerfile: Dockerfile
     environment:
-      - JAVA_OPTS=
-    volumes:
-      - ./datalake:/app/datalake
+      - BROKER_URL=tcp://activemq:61616
+      - INGESTION_QUEUE=document.ingested
+    depends_on:
+      activemq:
+        condition: service_healthy
     ports:
       - "7001:7001"
     networks:
       - search_net
-    depends_on:
-      - activemq
+    volumes:
+      - ./datalake:/app/datalake
 
+  # ---------- Indexing Service ----------
   indexing-service:
     build:
       context: ./indexing-service
       dockerfile: Dockerfile
     environment:
-      - DATAMART_DB=./datamart/index.db
+      - BROKER_URL=tcp://activemq:61616
+      - INGESTION_QUEUE=document.ingested
+      - DATAMART_DB=/app/datamart/index.db
     volumes:
       - ./datalake:/app/datalake:ro
       - ./datamart:/app/datamart
+    depends_on:
+      activemq:
+        condition: service_healthy
+      hazelcast:
+        condition: service_started
     ports:
       - "7002:7002"
     networks:
       - search_net
-    depends_on:
-      - activemq
-      - hazelcast
 
+  # ---------- Search Service ----------
   search-service:
     build:
       context: ./search-service
       dockerfile: Dockerfile
     environment:
-      - DATAMART_DB=./datamart/index.db
+      - DATAMART_DB=/app/datamart/index.db
     volumes:
-      - ./datamart:/app/datamart:ro
+      - ./datamart:/app/datamart
     expose:
       - "7003"
     networks:
       - search_net
     depends_on:
-      - hazelcast
+      hazelcast:
+        condition: service_started
 
+  # ---------- Control Module ----------
   control-service:
     build:
       context: ./control-module
@@ -81,10 +96,14 @@ services:
     networks:
       - search_net
     depends_on:
-      - ingestion-service
-      - indexing-service
-      - search-service
+      ingestion-service:
+        condition: service_started
+      indexing-service:
+        condition: service_started
+      search-service:
+        condition: service_started
 
+  # ---------- Benchmark ----------
   benchmark:
     build:
       context: ./benchmarks
@@ -93,11 +112,13 @@ services:
       - INGESTION_URL=http://ingestion-service:7001
       - INDEXING_URL=http://indexing-service:7002
       - SEARCH_URL=http://search-service:7003
+    depends_on:
+      control-service:
+        condition: service_started
     networks:
       - search_net
-    depends_on:
-      - control-service
 
+  # ---------- NGINX ----------
   nginx:
     image: nginx:latest
     ports:
@@ -107,7 +128,8 @@ services:
     networks:
       - search_net
     depends_on:
-      - search-service
+      search-service:
+        condition: service_started
 
 networks:
   search_net:
