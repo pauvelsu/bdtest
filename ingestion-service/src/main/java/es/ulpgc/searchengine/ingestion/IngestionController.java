@@ -5,6 +5,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
 import es.ulpgc.searchengine.ingestion.utils.Downloader;
+import es.ulpgc.searchengine.ingestion.messaging.EventPublisher;
 
 import java.nio.file.*;
 import java.util.*;
@@ -12,6 +13,12 @@ import java.util.stream.Collectors;
 
 public class IngestionController {
     private static final Gson gson = new Gson();
+
+    private final EventPublisher eventPublisher;
+
+    public IngestionController(EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     public void register(Javalin app) {
         app.post("/ingest/{book_id}", this::downloadBook);
@@ -44,6 +51,12 @@ public class IngestionController {
             Files.write(bookDir.resolve("header.txt"), header);
             Files.write(bookDir.resolve("body.txt"), body);
             System.out.println("Book " + bookId + ": header=" + header.size() + " lines, body=" + body.size() + " lines");
+
+            // ---- NUEVO: publicar evento document.ingested en ActiveMQ ----
+            if (eventPublisher != null) {
+                eventPublisher.publishBookIngested(bookId);
+            }
+
             ctx.status(200).result(gson.toJson(Map.of(
                     "book_id", bookId,
                     "status", "downloaded",

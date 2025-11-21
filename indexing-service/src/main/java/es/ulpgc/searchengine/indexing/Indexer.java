@@ -9,11 +9,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class Indexer {
+
     private final DatamartSQLite repository;
     private static final String DATALAKE_PATH = "./datalake";
 
     public Indexer(DatamartSQLite repository) {
         this.repository = repository;
+    }
+
+    /** NUEVO: método thread-safe llamado desde el consumidor JMS */
+    public synchronized boolean indexDocument(int bookId) {
+        return indexBook(bookId);
     }
 
     public boolean indexBook(int bookId) {
@@ -23,20 +29,27 @@ public class Indexer {
 
             Path header = bookDir.resolve("header.txt");
             Path body = bookDir.resolve("body.txt");
+
             if (!Files.exists(header) || !Files.exists(body))
-                throw new IllegalStateException("Missing header/body files for book " + bookId);
+                throw new IllegalStateException("Missing header/body for " + bookId);
 
             Meta meta = MetadataExtractor.extract(header);
             String content = Files.readString(body);
-            if (content.isBlank()) throw new IllegalStateException("Empty content for book " + bookId);
+
+            if (content.isBlank())
+                throw new IllegalStateException("Empty content for book " + bookId);
 
             Map<String, List<Integer>> index = buildInvertedIndex(content);
+
             repository.deleteIndexForBook(bookId);
             repository.insertOrUpdateBook(bookId, meta.title, meta.author, meta.language, meta.year, content);
             repository.insertIndex(bookId, index);
 
-            System.out.printf("Indexed book %d (%d terms): %s by %s%n", bookId, index.size(), meta.title, meta.author);
+            System.out.printf("Indexed %d (%d terms): %s by %s%n",
+                    bookId, index.size(), meta.title, meta.author);
+
             return true;
+
         } catch (Exception e) {
             logError("Error indexing book " + bookId, e);
             return false;
@@ -54,10 +67,11 @@ public class Indexer {
                 int bookId = safeParseInt(dir.getFileName().toString());
                 if (bookId > 0 && indexBook(bookId)) success.incrementAndGet();
             }
-            System.out.printf("Rebuild completed: %d/%d books successfully indexed.%n", success.get(), total);
+            System.out.printf("Rebuild completed: %d/%d books.%n", success.get(), total);
             return success.get();
+
         } catch (Exception e) {
-            logError("Error rebuilding all indexes", e);
+            logError("Error rebuilding index", e);
             return 0;
         }
     }
@@ -70,20 +84,22 @@ public class Indexer {
         return status;
     }
 
-    public Map<String, Object> getDatalakeStats() {
+    private Map<String, Object> getDatalakeStats() {
         Map<String, Object> stats = new HashMap<>();
         try {
             List<Path> bookDirs = findAllBookDirectories();
             Set<String> dates = new HashSet<>();
             Set<String> timestamps = new HashSet<>();
 
-            for (Path bookDir : bookDirs) {
-                Path minute = bookDir.getParent();
+            for (Path dir : bookDirs) {
+                Path minute = dir.getParent();
                 Path hour = minute != null ? minute.getParent() : null;
                 Path date = hour != null ? hour.getParent() : null;
+
                 if (date != null)
                     timestamps.add(date.getFileName() + "/" + hour.getFileName() + "/" + minute.getFileName());
-                if (date != null) dates.add(date.getFileName().toString());
+                if (date != null)
+                    dates.add(date.getFileName().toString());
             }
 
             stats.put("total_books", bookDirs.size());
@@ -101,6 +117,7 @@ public class Indexer {
         String[] tokens = text.toLowerCase()
                 .replaceAll("[^a-záéíóúüñ\\s]", " ")
                 .split("\\s+");
+
         for (int i = 0; i < tokens.length; i++) {
             String word = tokens[i].trim();
             if (word.length() > 2)
@@ -122,34 +139,20 @@ public class Indexer {
             return stream.filter(Files::isDirectory)
                     .filter(p -> {
                         String name = p.getFileName().toString();
-                        return name.matches("\\d+") && !name.matches("\\d{8}") && !name.matches("\\d{2}");
+                        return name.matches("\\d+") &&      // bookId
+                                !name.matches("\\d{8}") &&   // fecha
+                                !name.matches("\\d{2}");     // hour/minute
                     })
                     .toList();
         }
     }
 
-    private List<Path> safeListDirs(Path parent) {
-        return safeListDirs(parent, Files::isDirectory);
-    }
-
-    private List<Path> safeListDirs(Path parent, java.util.function.Predicate<Path> filter) {
-        try (Stream<Path> stream = Files.list(parent)) {
-            return stream.filter(Files::isDirectory).filter(filter).toList();
-        } catch (Exception e) {
-            logError("Error listing dirs in " + parent, e);
-            return List.of();
-        }
-    }
-
     private int safeParseInt(String s) {
-        try {
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        try { return Integer.parseInt(s); }
+        catch (NumberFormatException e) { return -1; }
     }
 
-    private void logError(String message, Exception e) {
-        System.err.println(message + ": " + e.getMessage());
+    private void logError(String msg, Exception e) {
+        System.err.println(msg + ": " + e.getMessage());
     }
 }

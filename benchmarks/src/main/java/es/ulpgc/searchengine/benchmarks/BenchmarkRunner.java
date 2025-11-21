@@ -79,7 +79,7 @@ public class BenchmarkRunner {
 
     private void saveResults(List<BenchmarkResult> results) throws Exception {
         Path dir = Paths.get("results");
-        Files.createDirectories(dir);
+        Files.createDirectories(dir);  // <-- crea la carpeta correctamente
 
         String json = gson.toJson(results);
         Files.writeString(dir.resolve("benchmarks.json"), json);
@@ -92,6 +92,7 @@ public class BenchmarkRunner {
                         r.bookId, r.ingestionTime, r.indexingTime, r.searchTime, r.totalTime, r.success));
             }
         }
+
         System.out.println("Results written to results/benchmarks.csv");
     }
 }

@@ -6,8 +6,24 @@ import java.util.*;
 public class DatamartSQLite {
 
     private final String dbPath;
+
     public DatamartSQLite(String dbPath) {
         this.dbPath = dbPath;
+        enableBusyTimeout();
+    }
+
+    /** Activa el busy_timeout para evitar SQLITE_BUSY */
+    private void enableBusyTimeout() {
+        try (Connection conn = connect();
+             Statement st = conn.createStatement()) {
+
+            st.execute("PRAGMA busy_timeout = 5000;"); // 5 segundos
+            st.execute("PRAGMA journal_mode = WAL;");  // mejor para concurrencia
+
+            System.out.println("[Datamart] SQLite configurado con busy_timeout=5000ms y WAL");
+        } catch (SQLException e) {
+            System.err.println("[Datamart] Error configurando busy_timeout: " + e.getMessage());
+        }
     }
 
     public void initSchema() {
@@ -35,12 +51,15 @@ public class DatamartSQLite {
             """);
 
             System.out.println("[Datamart] Schema initialized");
+
         } catch (SQLException e) {
             System.err.println("[Datamart] Schema error: " + e.getMessage());
         }
     }
 
-    public void insertOrUpdateBook(int bookId, String title, String author, String language, int year, String content) {
+    public void insertOrUpdateBook(int bookId, String title, String author,
+                                   String language, int year, String content) {
+
         String sql = """
             INSERT INTO books (book_id, title, author, language, year, content)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -69,9 +88,6 @@ public class DatamartSQLite {
         }
     }
 
-    /* -----------------------------------------
-       Delete old index entries for a book
-       ----------------------------------------- */
     public void deleteIndexForBook(int bookId) {
         try (Connection conn = connect();
              PreparedStatement ps = conn.prepareStatement(
@@ -99,12 +115,11 @@ public class DatamartSQLite {
             for (var entry : index.entrySet()) {
                 String term = entry.getKey();
                 List<Integer> positions = entry.getValue();
-                String posCsv = positions.toString();  // example: [3,7,20]
+                String posCsv = positions.toString();
 
                 ps.setString(1, term);
                 ps.setInt(2, bookId);
                 ps.setString(3, posCsv);
-
                 ps.addBatch();
             }
 
@@ -150,7 +165,12 @@ public class DatamartSQLite {
         return null;
     }
 
+    /** Conexión con busy_timeout garantizado */
     private Connection connect() throws SQLException {
-        return DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+        Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+        try (Statement st = conn.createStatement()) {
+            st.execute("PRAGMA busy_timeout = 5000;");
+        }
+        return conn;
     }
 }
